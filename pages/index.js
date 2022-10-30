@@ -1,8 +1,37 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import Image from "next/image";
+import styles from "../styles/Home.module.css";
 
 export default function Home() {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("handling submit");
+    let signedUrl = null;
+    await fetch("/api/get_signed_url", { method: "GET" })
+      .then((res) => res.json())
+      .then((json) => {
+        console.log(json);
+        signedUrl = json.signedUrl;
+      })
+      .catch((err) => console.error(err));
+
+    const input = document.getElementById("file-upload-input");
+    console.log("uploading file");
+    // const fd = new FormData();
+    // fd.append("uploadedFile", input.files[0]);
+    // console.log("appended file");
+
+    const response = await fetch(signedUrl, {
+      method: "PUT",
+      body: input.files[0],
+    });
+    // fetch("/api/file_upload", { method: "POST", body: { text: "hello" } });
+    console.log(
+      `\nResponse returned by signed URL: ${await response.text()}\n`
+    );
+    console.log("done with submission");
+  };
+
   return (
     <div className={styles.container}>
       <Head>
@@ -17,39 +46,14 @@ export default function Home() {
         </h1>
 
         <p className={styles.description}>
-          Get started by editing{' '}
+          Get started by editing{" "}
           <code className={styles.code}>pages/index.js</code>
         </p>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <input type="file" id="file-upload-input"></input>
+          <input type="submit"></input>
+        </form>
       </main>
 
       <footer className={styles.footer}>
@@ -58,12 +62,12 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
+          Powered by{" "}
           <span className={styles.logo}>
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>
         </a>
       </footer>
     </div>
-  )
+  );
 }
