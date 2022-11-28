@@ -2,6 +2,8 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import LoginButton from "../components/login-button";
+import LogoutButton from "../components/logout-button";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
   const handleSubmit = async (e) => {
@@ -33,6 +35,11 @@ export default function Home() {
     console.log("done with submission");
   };
 
+  const { data: session } = useSession();
+  if (!session) {
+    return <LoginButton />;
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -46,7 +53,7 @@ export default function Home() {
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
 
-        <LoginButton />
+        <LogoutButton />
 
         <p className={styles.description}>
           Get started by editing{" "}
