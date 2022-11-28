@@ -20,15 +20,11 @@ export default function Home() {
 
     const input = document.getElementById("file-upload-input");
     console.log("uploading file");
-    // const fd = new FormData();
-    // fd.append("uploadedFile", input.files[0]);
-    // console.log("appended file");
 
     const response = await fetch(signedUrl, {
       method: "PUT",
       body: input.files[0],
     });
-    // fetch("/api/file_upload", { method: "POST", body: { text: "hello" } });
     console.log(
       `\nResponse returned by signed URL: ${await response.text()}\n`
     );
