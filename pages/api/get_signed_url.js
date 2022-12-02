@@ -1,25 +1,37 @@
 import { S3Client } from "@aws-sdk/client-s3";
-// Set the AWS Region.
 const REGION = "us-east-2";
-// Create an Amazon S3 service client object.
 
-import {
-  // CreateBucketCommand,
-  // DeleteObjectCommand,
-  PutObjectCommand,
-  // DeleteBucketCommand,
-} from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-// import fetch from "node-fetch";
-
-export const bucketParams = {
-  Bucket: `attic-dev`,
-  Key: `test-object-${Math.ceil(Math.random() * 10 ** 10)}`,
-};
+import { PrismaClient } from "@prisma/client";
 
 export default async function handler(req, res) {
   if (req.method == "POST") {
-    const { accessKey, secretAccessKey } = req.body;
+    const prisma = new PrismaClient();
+
+    const { accessKey, secretAccessKey, fileName } = req.body;
+
+    const sessionToken = req.cookies["next-auth.session-token"];
+    const session = await prisma.session.findUnique({
+      where: { sessionToken: sessionToken },
+    });
+
+    console.log(session.sessionToken);
+
+    const file = await prisma.file.create({
+      data: {
+        name: fileName,
+        userId: session.userId,
+      },
+    });
+
+    console.log(file);
+
+    const bucketParams = {
+      Bucket: `attic-dev`,
+      Key: file.s3Identifier,
+    };
+
     try {
       const command = new PutObjectCommand(bucketParams);
       const s3Client = new S3Client({
