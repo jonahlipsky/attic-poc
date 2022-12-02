@@ -45,6 +45,14 @@ model User {
   accounts      Account[]
   sessions      Session[]
   posts         Post[]
+  files         File[]
+}
+model File {
+  id            String    @id @default(cuid())
+  name          String?
+  s3Identifier  String @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
 }
 
 model Post {
