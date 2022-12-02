@@ -2,9 +2,6 @@ import { S3Client } from "@aws-sdk/client-s3";
 // Set the AWS Region.
 const REGION = "us-east-2";
 // Create an Amazon S3 service client object.
-const s3Client = new S3Client({
-  region: REGION,
-});
 
 import {
   // CreateBucketCommand,
@@ -21,9 +18,18 @@ export const bucketParams = {
 };
 
 export default async function handler(req, res) {
-  if (req.method == "GET") {
+  if (req.method == "POST") {
+    const { accessKey, secretAccessKey } = req.body;
     try {
       const command = new PutObjectCommand(bucketParams);
+      const s3Client = new S3Client({
+        region: REGION,
+        credentials: {
+          accessKeyId: accessKey,
+          secretAccessKey: secretAccessKey,
+        },
+      });
+
       const signedUrl = await getSignedUrl(s3Client, command, {
         expiresIn: 3600,
       });

@@ -20,6 +20,14 @@ export default function Welcome() {
       {welcomeMessage}
       <form className={styles.form} onSubmit={handleSubmit}>
         <input type="file" id="file-upload-input" />
+        <label>
+          Access Key
+          <input type="text" id="access-id" />
+        </label>
+        <label>
+          Secret Access Key
+          <input type="text" id="secret-access-id" />
+        </label>
         <input type="submit" />
       </form>
     </div>
